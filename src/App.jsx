@@ -1,13 +1,17 @@
-import {useState,useEffect } from 'react'
+import {useState} from 'react'
 import './index.css'
-let data =[]
+let data ={
+    firstName:'',
+    email: "",
+    password: "",
+}
 const style_block={
                     display: "block",
                     height: "30px",
                     border: "none",
                     margin: "20px",
                     backgroundColor:"transparent",
-                    color:"rgb(255 142 0)",
+                    color:"rgba(176,174,28,1)",
                     fontSize:"20px"
                 }
     /* creatAccount///////////////////////////// */
@@ -18,7 +22,8 @@ const style_block={
             email: "",
             password: "",
             passwordConfirm: "",
-            check: false
+            check: false,
+            value:false
     })
     const {firstName,lastName,email,password,passwordConfirm,check} = state;
         function handleChange(event) {
@@ -30,12 +35,37 @@ const style_block={
         }
         function handleSubmit(event) {
             event.preventDefault();
-            data=state
-            {console.log(data)}
+            if(password != passwordConfirm){
+                window.alert('please Match the password with passwordConfirm')
+            }else if(check === false){
+                window.alert("sorry you have to agree with our policy")
+            }else if(firstName === ""){
+                window.alert('please enter the first name')
+            }else if(lastName === ""){
+                window.alert('please enter the last name')
+            }else if(email === ""){
+                window.alert('please enter the email')
+            }else if(password.length > 10 ){
+                window.alert('please make the password stronger')
+            }
+            else{
+                data=state
+                setState(prev => ({
+                    ...prev,value:true}))
+            }            
         }  
         return (
             <div className='createAccount'>
-                <form onSubmit={handleSubmit}>
+                {state.value?<p 
+                style={{
+                    position:"relative",
+                    top:"50%",
+                    right:"50%",
+                    transform:"translate(50%,50%)",
+                    color:"rgb(193 255 2)",
+                    fontSize:"40px"}} >your data has been saved
+                    </p>
+                    :<form onSubmit={handleSubmit}>
                 <input 
                         type="text" 
                         placeholder="First name"
@@ -68,6 +98,8 @@ const style_block={
                         value={password}
                         style={style_block}
                     />
+                    {password ? password.length < 10 ?<p style={{color:"red",fontSize:"16px"}}>make the password stronger</p>:null :null }
+                    {/* password.length < 10 ?<p style={{color:"red",fontSize:"16px"}}>make the password stronger</p>:null */}
                     <input 
                         type="password" 
                         placeholder="Confirm password"
@@ -84,64 +116,92 @@ const style_block={
                             onChange={handleChange}
                             checked={check}
                         />
-                        <label id='check' style={{color:"rgb(255 252 0"}} >  Are you agree with our policy</label>
+                        <label id='check' style={{color:"rgba(176,174,28,1)"}} >  Are you agree with our policy</label>
                         </div>
                     <button className="form--submit">Sign up</button>
-                </form>
+                </form>}        
             </div>
             )
     }
     /*//////////////////////////createAccount*/
     /* HadAccount/////////////////////////////// */
-    function HadAccount({name}) {
+    function HadAccount({firstName,email,password}) {
         const [formData, setFormData] = useState({
             email: "",
-            password: ""
+            password: "",
+            check : false
         })
         function handleChange(event) {
-            const {name, value, type, checked} = event.target
+            const {name, value} = event.target
             setFormData(prevFormData => ({
                 ...prevFormData,
-                [name]: type === "checkbox" ? checked : value
+                [name]: value
             }))
         }
         function handleSubmit(event) {
             event.preventDefault()
-            console.log(formData)
+            if(email != formData.email){
+                window.alert('wrong email')
+            }else if(password != formData.password){
+                window.alert('wrong password')
+            }else{
+                console.log('marwan')
+                setFormData(prevFormData => ({
+                    ...prevFormData,check:true}))
+            }
+
         }
         return (
             <div className='hadAccount'>
+                {formData.check?
+                <p style={{
+                    position:"relative",
+                    top:"50%",
+                    right:"50%",
+                    transform:"translate(50%,50%)",
+                    color:"rgb(193 255 2)",
+                    fontSize:"60px"}}>wlcome: {firstName}
+                    </p>:
                 <form onSubmit={handleSubmit}>                
-                <input 
-                        type="email" 
-                        placeholder="Email address"
-                        name="email"
-                        onChange={handleChange}
-                        value={formData.email}
-                        style={style_block}
-                    />
-                <input 
-                        type="password" 
-                        placeholder="Password"
-                        name="password"
-                        onChange={handleChange}
-                        value={formData.password}
-                        style={style_block}
-                    />
-                    <button>sigh in</button>
-                </form>
+                    <input 
+                            type="email" 
+                            placeholder="Email address"
+                            name="email"
+                            onChange={handleChange}
+                            value={formData.email}
+                            style={style_block}
+                        />
+                    <input 
+                            type="password" 
+                            placeholder="Password"
+                            name="password"
+                            onChange={handleChange}
+                            value={formData.password}
+                            style={style_block}
+                        />
+                        <button>sigh in</button>
+                </form>}
             </div>
             )
     }
     /*///////////////////////////HadAccount */
 function App() {
     const [account,setAccount] = useState({creat:false,had:false});
+    let btn
+    function style_btn(){
+        if(account.creat||account.had){
+            btn={}
+        }else{
+            btn={top:"50%"}
+        }
+    }
+    style_btn()
     return(
     <>
     {account.creat === true?<CreatAccount />:null}
-    {account.had === true?<HadAccount name={data.firstName}/>:null}
-    <button className='btn1' onClick={()=>{setAccount((prevAccount)=>({...prevAccount,creat:true,had:false}))}}>Creat Account</button>
-    <button className='btn2' onClick={()=>{setAccount((prevAccount)=>({...prevAccount,had:true,creat:false}))}}>Have Account</button>
+    {account.had === true?<HadAccount firstName={data.firstName}email={data.email} password={data.password}/>:null}
+    <button className='btn1' style={btn} onClick={()=>{setAccount((prevAccount)=>({...prevAccount,creat:true,had:false}))}}>Creat Account</button>
+    <button className='btn2' style={btn} onClick={()=>{setAccount((prevAccount)=>({...prevAccount,had:true,creat:false}))}}>Have Account</button>
     </>
   )
 }
